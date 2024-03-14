@@ -11,10 +11,11 @@ const { PORT, DB_HOST, DB_NAME, DB_PASSWORD, DB_USER, DB_PORT } = require("./con
 app.use(cors())
 app.use(express.json())
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use('/img_uploads', express.static(path.join(__dirname, 'img_uploads')));
 // File upload configuration
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, 'C:/xampp/htdocs/img_uploads/area_imgs/');
+    cb(null, 'img_uploads/area_imgs');
   },
   filename: function (req, file, cb) {
     cb(null, file.originalname);
@@ -40,27 +41,33 @@ db.connect(function (err) {
   if (err) throw err;
   console.log("mysql db Connected!");
   // Database creation
-  sql = "CREATE DATABASE IF NOT EXISTS precision_farming";
-  db.query(sql, (err, res) => {
-    if (err) {
-      console.log(err);
-    } else {
-      console.log("Database created");
-    }
-  });
-  // Database table creation
-  sql =
-    "CREATE TABLE IF NOT EXISTS land_segment (id INT AUTO_INCREMENT PRIMARY KEY, Area VARCHAR(255), Image VARCHAR(255))";
-  db.query(sql, (err, res) => {
-    if (err) {
-      console.log(err);
-    } else {
-      console.log("Table created");
-    }
-  });
+  // sql = "CREATE DATABASE IF NOT EXISTS precision_farming";
+  // db.query(sql, (err, res) => {
+  //   if (err) {
+  //     console.log(err);
+  //   } else {
+  //     console.log("Database created");
+  //   }
+  // });
+  // // Database table creation
+  // sql =
+  //   "CREATE TABLE IF NOT EXISTS land_segment (id INT AUTO_INCREMENT PRIMARY KEY, Area VARCHAR(255), Image VARCHAR(255))";
+  // db.query(sql, (err, res) => {
+  //   if (err) {
+  //     console.log(err);
+  //   } else {
+  //     console.log("Table created");
+  //   }
+  // });
 });
 app.get("/", (req, res) => {
-  res.json("get method is working");
+  // res.json("get method is working");
+  sql =
+    "Select * from test";
+  db.query(sql, (err, result) => {
+    if(err)console.log(err);
+    res.json(result)
+  })
 });
 
 app.post("/login", (req, res) => {
@@ -114,7 +121,7 @@ app.post("/login", (req, res) => {
 // });
 app.post("/add_farmarea",upload.single('image'), (req, res) => {
   const imagePath = req.file.path;
-  const img_org=imagePath.slice("28")
+  const img_org=imagePath.slice("12")
   var { dates, farm_id, area_id, coordinates, area, remarks } = req.body;
   sql =
     "INSERT INTO agri_farm_area (dates,farm_id,area_id,coordinates,img,area,remarks) VALUES ?";
